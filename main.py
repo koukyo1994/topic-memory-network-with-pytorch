@@ -1,5 +1,7 @@
 import argparse
 
+from pathlib import Path
+
 TOPIC_NUM = 0
 HIDDEN_NUM = [500, 500]
 TOPIC_EMB_DIM = 150
@@ -25,3 +27,15 @@ if __name__ == "__main__":
     parser.add_argument("--n_topics", default=50, type=int)
 
     args = parser.parse_args()
+
+    log_path = Path(args.log_dir)
+    log_path.mkdir(exist_ok=True)
+
+    emb_path = Path(args.embedding)
+    emb_path.mkdir(exist_ok=True)
+
+    data_path = Path(args.data)
+    data_path.mkdir(exist_ok=True)
+
+    out_path = Path(args.output)
+    out_path.mkdir(exist_ok=True)
