@@ -1,5 +1,7 @@
 import sys
 import time
+import json
+import pickle
 import logging
 import datetime as dt
 
@@ -38,3 +40,15 @@ def get_logger(name="Main", exp_name="exp"):
     logger.addHandler(fh)
     logger.addHandler(sh)
     return logger
+
+
+def popen(data_path):
+    with open(data_path, "rb") as f:
+        pkl = pickle.load(f)
+    return pkl
+
+
+def jopen(data_path):
+    with open(data_path, "r") as f:
+        js = json.load(f)
+    return js

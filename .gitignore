@@ -120,3 +120,8 @@ dmypy.json
 # Binary
 *.pkl
 *npy
+.bin
+.vec
+
+# Editor
+.vscode

@@ -1,6 +1,4 @@
 import gc
-import json
-import pickle
 
 import numpy as np
 
@@ -11,27 +9,25 @@ from sklearn.model_selection import train_test_split
 
 from keras.preprocessing.sequence import pad_sequences
 
+from core.util import popen, jopen
+
 
 class DataLoader:
     def __init__(self, data_path, maxlen):
-        seq_train = pickle.load(open(data_path / "dataMsgTrain.pkl", "rb"))
-        seq_test = pickle.load(open(data_path / "dataMsgTest.pkl", "rb"))
+        seq_train = popen(data_path / "dataMsgTrain.pkl")
+        seq_test = popen(data_path / "dataMsgTest.pkl")
 
         self.seq_train = pad_sequences(seq_train, maxlen=maxlen)
         self.seq_test = pad_sequences(seq_test, maxlen=maxlen)
         del seq_train, seq_test
         gc.collect()
 
-        self.bow_train = pickle.load(
-            open(data_path / "dataMsgBowTrain.pkl", "rb"))
-        self.bow_test = pickle.load(
-            open(data_path / "dataMsgBowTest.pkl", "rb"))
-        self.label_train = pickle.load(
-            open(data_path / "dataMsgLabelTrain.pkl", "rb"))
-        self.label_test = pickle.load(
-            open(data_path / "dataMsglabelTest.pkl", "rb"))
+        self.bow_train = popen(data_path / "dataMsgBowTrain.pkl")
+        self.bow_test = popen(data_path / "dataMsgBowTest.pkl")
+        self.label_train = np.array(popen(data_path / "dataMsgLabelTrain.pkl"))
+        self.label_test = np.array(popen(data_path / "dataMsglabelTest.pkl"))
 
-        self.label_dict = json.load(open(data_path / "labelDict.json"))
+        self.label_dict = jopen(data_path / "labelDict.json")
         self.CATEGORY = len(self.label_dict)
 
         self.seq_val = None
