@@ -13,7 +13,7 @@ from core.util import popen, jopen
 
 
 class DataLoader:
-    def __init__(self, data_path, maxlen):
+    def __init__(self, data_path, maxlen, device="cpu"):
         seq_train = popen(data_path / "dataMsgTrain.pkl")
         seq_test = popen(data_path / "dataMsgTest.pkl")
 
@@ -34,6 +34,7 @@ class DataLoader:
         self.bow_val = None
         self.label_val = None
         self.splitted = False
+        self.device = device
 
     def _to_sparse_tensor(self, x):
         coo = x.tocoo()
@@ -42,12 +43,13 @@ class DataLoader:
         i = torch.LongTensor(indices)
         v = torch.FloatTensor(values)
         shape = coo.shape
-        return torch.sparse.FloatTensor(i, v, torch.Size(shape)).cuda()
+        return torch.sparse.FloatTensor(i, v,
+                                        torch.Size(shape)).to(self.device)
 
     def _create_loader(self, seq, bow, label, batch_size=32, shuffle=True):
-        seq_tensor = torch.tensor(seq, dtype=torch.long).cuda()
+        seq_tensor = torch.tensor(seq, dtype=torch.long).to(self.device)
         bow_tensor = self._to_sparse_tensor(bow)
-        label_tensor = torch.tensor(label, dtype=torch.int32).cuda()
+        label_tensor = torch.tensor(label, dtype=torch.int32).to(self.device)
         dataset = torch.utils.data.TensorDataset(seq_tensor, bow_tensor,
                                                  label_tensor)
         loader = torch.utils.data.DataLoader(

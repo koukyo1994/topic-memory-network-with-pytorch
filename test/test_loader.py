@@ -1,5 +1,7 @@
 import numpy as np
 
+import torch
+
 from unittest import TestCase
 from pathlib import Path
 
@@ -28,3 +30,28 @@ class TestDataLoader(TestCase):
         self.assertEqual(loader.label_train.shape,
                          (loader.seq_train.shape[0], ))
         self.assertEqual(loader.label_test.shape, (loader.seq_test.shape[0], ))
+
+        self.assertIsInstance(loader.label_dict, dict)
+
+    def test_to_sparse_tensor(self):
+        loader = DataLoader(self.data_path, 21)
+        bow_train_tensor = loader._to_sparse_tensor(loader.bow_train)
+        bow_test_tensor = loader._to_sparse_tensor(loader.bow_test)
+
+        self.assertIsInstance(bow_train_tensor, torch.sparse.FloatTensor)
+        self.assertIsInstance(bow_test_tensor, torch.sparse.FloatTensor)
+        self.assertEqual(bow_train_tensor.size(1), bow_test_tensor.size(1))
+
+    def test_create_loader(self):
+        loader = DataLoader(self.data_path, 21)
+        torch_loader = loader._create_loader(
+            loader.seq_train, loader.bow_train, loader.label_train)
+        for (seq, bow, label) in torch_loader:
+            self.assertIsInstance(seq, torch.FloatTensor)
+            self.assertIsInstance(bow, torch.sparse.FloatTensor)
+            self.assertIsInstance(label, torch.IntTensor)
+
+            self.assertEqual(seq.size(0), 32)
+            self.assertEqual(bow.size(0), 32)
+            self.assertEqual(label.size(0), 32)
+            break
